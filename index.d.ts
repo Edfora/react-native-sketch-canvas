@@ -90,6 +90,7 @@ export interface SketchCanvasProps {
 export class SketchCanvas extends React.Component<SketchCanvasProps & ViewProperties> {
   clear(): void
   undo(): number
+  redo(): number
   addPath(data: Path): void
   deletePath(id: number): void
 
@@ -161,12 +162,15 @@ export interface RNSketchCanvasProps {
    *    mode: 'AspectFill' | 'AspectFit' | 'ScaleToFill'
    * }
    */
-  localSourceImage?: LocalSourceImage
+  localSourceImage?: LocalSourceImage,
+  useStrokeColorFromStrokeIndex?: boolean,
+  useCustomStrokeWidth?: boolean
 }
 
 export default class RNSketchCanvas extends React.Component<RNSketchCanvasProps & ViewProperties> {
   clear(): void
   undo(): number
+  redo(): number
   addPath(data: Path): void
   deletePath(id: number): void
   save(): void

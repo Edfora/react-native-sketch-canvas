@@ -82,6 +82,7 @@ class SketchCanvas extends React.Component {
     super(props)
     this._pathsToProcess = []
     this._paths = []
+    this._deletedPaths = []
     this._path = null
     this._handle = null
     this._screenScale = Platform.OS === 'ios' ? 1 : PixelRatio.get()
@@ -116,6 +117,15 @@ class SketchCanvas extends React.Component {
     return lastId
   }
 
+  redo() {
+    if (this._deletedPaths.length > 0) {
+      const lastDeletedPath = this._deletedPaths.pop()
+      this.addPath(lastDeletedPath)
+    } else {
+      console.log('you havent undo any path yet')
+    }
+  } 
+
   addPath(data) {
     if (this._initialized) {
       if (this._paths.filter(p => p.path.id === data.path.id).length === 0) this._paths.push(data)
@@ -132,6 +142,8 @@ class SketchCanvas extends React.Component {
   }
 
   deletePath(id) {
+    const deletePathItem = this._paths.find(p => p.path.id === id)
+    this._deletedPaths.push(deletePathItem)
     this._paths = this._paths.filter(p => p.path.id !== id)
     UIManager.dispatchViewManagerCommand(this._handle, UIManager.RNSketchCanvas.Commands.deletePath, [id])
   }
@@ -188,6 +200,7 @@ class SketchCanvas extends React.Component {
         )
         const x = parseFloat((gestureState.x0 - this._offset.x).toFixed(2)), y = parseFloat((gestureState.y0 - this._offset.y).toFixed(2))
         this._path.data.push(`${x},${y}`)
+        this._deletedPaths = []
         this.props.onStrokeStart(x, y)
       },
       onPanResponderMove: (evt, gestureState) => {

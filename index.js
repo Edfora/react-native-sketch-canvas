@@ -59,6 +59,7 @@ export default class RNSketchCanvas extends React.Component {
 
     permissionDialogTitle: PropTypes.string,
     permissionDialogMessage: PropTypes.string,
+    useStrokeColorFromStrokeIndex: PropTypes.bool
   };
 
   static defaultProps = {
@@ -117,6 +118,8 @@ export default class RNSketchCanvas extends React.Component {
 
     permissionDialogTitle: '',
     permissionDialogMessage: '',
+    useStrokeColorFromStrokeIndex: false, // Use if you want to dispatch stroke color from props,
+    useCustomStrokeWidth: false, // Use if you want to dispatch strocke index from props
   };
 
 
@@ -140,6 +143,10 @@ export default class RNSketchCanvas extends React.Component {
 
   undo() {
     return this._sketchCanvas.undo()
+  }
+
+  redo() {
+    return this._sketchCanvas.redo()
   }
 
   addPath(data) {
@@ -202,6 +209,9 @@ export default class RNSketchCanvas extends React.Component {
   }
 
   render() {
+    const strokeColor = this.props.useStrokeColorFromStrokeIndex
+      ? this.props.strokeColors[this.props.defaultStrokeIndex].color
+      : this.state.color + (this.state.color.length === 9 ? '' : this.state.alpha)
     return (
       <View style={this.props.containerStyle}>
         <View style={{ flexDirection: 'row' }}>
@@ -247,12 +257,12 @@ export default class RNSketchCanvas extends React.Component {
         <SketchCanvas
           ref={ref => this._sketchCanvas = ref}
           style={this.props.canvasStyle}
-          strokeColor={this.state.color + (this.state.color.length === 9 ? '' : this.state.alpha)}
+          strokeColor={strokeColor}
           onStrokeStart={this.props.onStrokeStart}
           onStrokeChanged={this.props.onStrokeChanged}
           onStrokeEnd={this.props.onStrokeEnd}
           user={this.props.user}
-          strokeWidth={this.state.strokeWidth}
+          strokeWidth={this.props.useCustomStrokeWidth ? this.props.defaultStrokeWidth : this.state.strokeWidth}
           onSketchSaved={(success, path) => this.props.onSketchSaved(success, path)}
           onPathsChange={this.props.onPathsChange}
           text={this.props.text}
